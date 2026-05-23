@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Массаж — расслабление и забота о теле</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            background: #1a0f0a;
+            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+        }
+
+        body {
+            height: 300vh;
+        }
+
+        /* Фоновая анимация */
+        .frame-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .frame-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Тёмный градиент поверх для читаемости текста */
+        .frame-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(0,0,0,0.55) 0%,
+                rgba(0,0,0,0.25) 40%,
+                rgba(0,0,0,0.25) 60%,
+                rgba(0,0,0,0.7) 100%
+            );
+            pointer-events: none;
+        }
+
+        /* Контейнер для текстовых блоков (фиксированный поверх анимации) */
+        .content-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .section.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* === Секция 1: Заголовок === */
+        .section-hero {
+            justify-content: space-between;
+            padding-top: 60px;
+            padding-bottom: 60px;
+        }
+
+        .hero-top {
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 300;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.85;
+        }
+
+        .hero-bottom {
+            text-align: center;
+            font-size: 13px;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        .scroll-hint {
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* === Секция 2: Услуги === */
+        .services-title {
+            font-size: 22px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+        }
+
+        .services-list {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .service-item {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .service-info {
+            flex: 1;
+        }
+
+        .service-name {
+            font-size: 15px;
+            font-weight: 400;
+            margin-bottom: 4px;
+        }
+
+        .service-duration {
+            font-size: 12px;
+            opacity: 0.65;
+        }
+
+        .service-price {
+            font-size: 17px;
+            font-weight: 500;
+            white-space: nowrap;
+            color: #f0d8b8;
+        }
+
+        .service-note {
+            margin-top: 18px;
+            font-size: 12px;
+            opacity: 0.7;
+            text-align: center;
+            line-height: 1.5;
+            max-width: 420px;
+        }
+
+        /* === Секция 3: Контакты === */
+        .contacts-title {
+            font-size: 22px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            text-align: center;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+        }
+
+        .info-cards {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .info-card {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 14px;
+            padding: 14px 18px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .badge {
+            background: rgba(240, 216, 184, 0.15);
+            border: 1px solid rgba(240, 216, 184, 0.35);
+            color: #f0d8b8;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 7px 14px;
+            border-radius: 20px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #c9a37a, #8b6240);
+            color: #fff;
+            padding: 14px 36px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 6px 20px rgba(139, 98, 64, 0.5);
+            transition: transform 0.2s;
+        }
+
+        .cta-button:active {
+            transform: scale(0.97);
+        }
+
+        /* Прелоадер */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a0f0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+
+        .preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .preloader-text {
+            color: #f0d8b8;
+            font-size: 13px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        /* Адаптация под маленькие экраны */
+        @media (max-width: 360px) {
+            .hero-title { font-size: 40px; letter-spacing: 4px; }
+            .service-name { font-size: 14px; }
+            .service-price { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Прелоадер -->
+    <div class="preloader" id="preloader">
+        <div class="preloader-text">Загрузка...</div>
+    </div>
+
+    <!-- Анимация массажа -->
+    <div class="frame-container">
+        <img id="frame" src="webp/frame_000.webp" alt="Массаж">
+    </div>
+
+    <!-- Контент поверх анимации -->
+    <div class="content-overlay">
+
+        <!-- Секция 1: Hero -->
+        <div class="section section-hero" data-start="0" data-end="0.33">
+            <div class="hero-top">
+                <div class="hero-title">Массаж</div>
+                <div class="hero-subtitle">Расслабление · Здоровье · Забота</div>
+            </div>
+            <div class="hero-bottom">
+                <span class="scroll-hint">↓ листайте вниз ↓</span>
+            </div>
+        </div>
+
+        <!-- Секция 2: Услуги -->
+        <div class="section section-services" data-start="0.33" data-end="0.66">
+            <div class="services-title">Услуги и цены</div>
+            <div class="services-list">
+                <div class="service-item">
+                    <div class="service-info">
+                        <div class="service-name">Классический массаж всего тела</div>
+                        <div class="service-duration">1 час</div>
+                    </div>
+                    <div class="service-price">1800 ₽</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-info">
+                        <div class="service-name">Классический массаж всего тела</div>
+                        <div class="service-duration">1,5 часа</div>
+                    </div>
+                    <div class="service-price">2300 ₽</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-info">
+                        <div class="service-name">Массаж спины</div>
+                        <div class="service-duration">45 минут</div>
+                    </div>
+                    <div class="service-price">1300 ₽</div>
+                </div>
+                <div class="service-item">
+                    <div class="service-info">
+                        <div class="service-name">Массаж ног, рук, стоп, головы</div>
+                        <div class="service-duration">По договорённости</div>
+                    </div>
+                    <div class="service-price">—</div>
+                </div>
+            </div>
+            <div class="service-note">
+                Скидки при покупке от 5 сеансов — обсуждаются индивидуально в зависимости от вида массажа
+            </div>
+        </div>
+
+        <!-- Секция 3: Контакты -->
+        <div class="section section-contacts" data-start="0.66" data-end="1.0">
+            <div class="contacts-title">Контакты</div>
+
+            <div class="badges">
+                <div class="badge">🎁 Подарочные сертификаты</div>
+                <div class="badge">🚗 Работаю на выезд</div>
+            </div>
+
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-label">Адрес</div>
+                    <div class="info-value">
+                        Бульвар Энтузиастов, 1П, 3 этаж<br>
+                        Академия косметологии и массажа «Рада»
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Также</div>
+                    <div class="info-value">Принимаю с выездом на дом</div>
+                </div>
+            </div>
+
+            <a href="#" class="cta-button">Записаться</a>
+        </div>
+
+    </div>
+
+    <script>
+        const frameImage = document.getElementById('frame');
+        const preloader = document.getElementById('preloader');
+        const totalFrames = 257;
+        const framesPath = 'webp/';
+
+        // Предзагрузка кадров
+        const images = [];
+        let loadedCount = 0;
+
+        for (let i = 0; i < totalFrames; i++) {
+            const img = new Image();
+            const frameNum = String(i).padStart(3, '0');
+            img.src = `${framesPath}frame_${frameNum}.webp`;
+            img.onload = () => {
+                loadedCount++;
+                // Когда загружены первые 30 кадров — скрываем прелоадер
+                if (loadedCount === 30) {
+                    preloader.classList.add('hidden');
+                }
+            };
+            images.push(img);
+        }
+
+        // На случай если onload не сработает — скрываем через 3 сек
+        setTimeout(() => preloader.classList.add('hidden'), 3000);
+
+        // Секции
+        const sections = document.querySelectorAll('.section');
+
+        // Обновление кадра и активной секции при скролле
+        function update() {
+            const scrollTop = window.scrollY;
+            const maxScroll = document.body.scrollHeight - window.innerHeight;
+            const scrollFraction = scrollTop / maxScroll;
+
+            // Кадр
+            const frameIndex = Math.min(
+                totalFrames - 1,
+                Math.floor(scrollFraction * totalFrames)
+            );
+            const frameNum = String(frameIndex).padStart(3, '0');
+            frameImage.src = `${framesPath}frame_${frameNum}.webp`;
+
+            // Активная секция
+            sections.forEach(section => {
+                const start = parseFloat(section.dataset.start);
+                const end = parseFloat(section.dataset.end);
+                if (scrollFraction >= start && scrollFraction <= end) {
+                    section.classList.add('active');
+                } else {
+                    section.classList.remove('active');
+                }
+            });
+        }
+
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    update();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Стартовое состояние
+        update();
+    </script>
+
+</body>
+</html>
