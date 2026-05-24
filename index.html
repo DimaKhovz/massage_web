@@ -2,7 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Массаж — расслабление и забота о теле</title>
     <style>
         * {
@@ -10,18 +13,23 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         html, body {
             width: 100%;
-            background: #1a0f0a;
-            overflow-x: hidden;
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #e8dfd3;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: #fff;
-        }
-
-        body {
-            height: 300vh;
+            color: #3d2817;
+            overscroll-behavior: none;
+            touch-action: none;
         }
 
         /* Фоновая анимация */
@@ -31,8 +39,11 @@
             left: 0;
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             overflow: hidden;
             z-index: 1;
+            touch-action: none;
+            background: #e8dfd3;
         }
 
         .frame-container img {
@@ -40,33 +51,34 @@
             height: 100%;
             object-fit: cover;
             display: block;
-        }
-
-        /* Тёмный градиент поверх для читаемости текста */
-        .frame-container::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                to bottom,
-                rgba(0,0,0,0.55) 0%,
-                rgba(0,0,0,0.25) 40%,
-                rgba(0,0,0,0.25) 60%,
-                rgba(0,0,0,0.7) 100%
-            );
             pointer-events: none;
         }
-
-        /* Контейнер для текстовых блоков (фиксированный поверх анимации) */
+/* Нежный градиент слева для читабельности текста */
+.frame-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        rgba(232, 223, 211, 0.55) 0%,
+        rgba(232, 223, 211, 0.35) 40%,
+        rgba(232, 223, 211, 0.15) 75%,
+        rgba(232, 223, 211, 0) 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+        /* Контейнер для текстовых блоков */
         .content-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             z-index: 2;
             pointer-events: none;
         }
@@ -77,55 +89,70 @@
             left: 0;
             width: 100%;
             height: 100%;
+            padding: max(40px, env(safe-area-inset-top, 40px)) 24px max(40px, env(safe-area-inset-bottom, 40px)) 24px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px 24px;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
         }
 
         .section.active {
             opacity: 1;
+        }
+
+        .section.active a,
+        .section.active button {
             pointer-events: auto;
         }
 
-        /* === Секция 1: Заголовок === */
+        /* Текст размещается в ЛЕВОЙ зоне, где светлый фон */
+       .text-zone {
+    width: 52%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+}
+
+        /* === Секция 1: Hero === */
         .section-hero {
             justify-content: space-between;
-            padding-top: 60px;
-            padding-bottom: 60px;
         }
 
-        .hero-top {
-            text-align: center;
-        }
+        .hero-top { width: 100%; }
 
         .hero-title {
-            font-size: 48px;
+            font-size: 44px;
             font-weight: 300;
-            letter-spacing: 6px;
+            letter-spacing: 4px;
             text-transform: uppercase;
-            margin-bottom: 12px;
-            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+            color: #3d2817;
+            margin-bottom: 14px;
+            line-height: 1;
+        }
+
+        .hero-divider {
+            width: 50px;
+            height: 1px;
+            background: #8b6240;
+            margin-bottom: 14px;
         }
 
         .hero-subtitle {
-            font-size: 14px;
-            font-weight: 300;
-            letter-spacing: 3px;
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 2.5px;
             text-transform: uppercase;
-            opacity: 0.85;
+            color: #6b4a30;
+            line-height: 1.6;
         }
 
         .hero-bottom {
-            text-align: center;
-            font-size: 13px;
+            font-size: 11px;
             letter-spacing: 2px;
-            opacity: 0.7;
+            color: #6b4a30;
             text-transform: uppercase;
+            opacity: 0.75;
         }
 
         .scroll-hint {
@@ -135,150 +162,176 @@
 
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(8px); }
+            50% { transform: translateY(6px); }
         }
 
         /* === Секция 2: Услуги === */
+        .section-services {
+            justify-content: center;
+        }
+
         .services-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 300;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            margin-bottom: 32px;
-            text-align: center;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            color: #3d2817;
+            margin-bottom: 8px;
+        }
+
+        .section-divider {
+            width: 40px;
+            height: 1px;
+            background: #8b6240;
+            margin-bottom: 22px;
         }
 
         .services-list {
-            width: 100%;
-            max-width: 420px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
         }
 
         .service-item {
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 14px;
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(139, 98, 64, 0.2);
         }
 
-        .service-info {
-            flex: 1;
-        }
+        .service-item:last-child { border-bottom: none; }
 
         .service-name {
-            font-size: 15px;
-            font-weight: 400;
+            font-size: 13px;
+            font-weight: 500;
+            color: #3d2817;
             margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .service-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 10px;
         }
 
         .service-duration {
-            font-size: 12px;
-            opacity: 0.65;
+            font-size: 11px;
+            color: #8b6240;
+            letter-spacing: 0.5px;
         }
 
         .service-price {
-            font-size: 17px;
-            font-weight: 500;
-            white-space: nowrap;
-            color: #f0d8b8;
-        }
+    font-size: 15px;
+    font-weight: 600;
+    color: #5a3a20;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+}
 
         .service-note {
             margin-top: 18px;
-            font-size: 12px;
-            opacity: 0.7;
-            text-align: center;
+            font-size: 10px;
+            color: #6b4a30;
+            opacity: 0.85;
             line-height: 1.5;
-            max-width: 420px;
+            font-style: italic;
         }
 
         /* === Секция 3: Контакты === */
+        .section-contacts {
+            justify-content: center;
+        }
+
         .contacts-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 300;
-            letter-spacing: 4px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            margin-bottom: 28px;
-            text-align: center;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+            color: #3d2817;
+            margin-bottom: 8px;
         }
 
-        .info-cards {
-            width: 100%;
-            max-width: 420px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .info-card {
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 14px;
-            padding: 14px 18px;
+        .info-block {
+            margin-bottom: 18px;
         }
 
         .info-label {
-            font-size: 11px;
-            opacity: 0.6;
+            font-size: 10px;
+            color: #8b6240;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             margin-bottom: 6px;
         }
 
         .info-value {
-            font-size: 14px;
+            font-size: 13px;
+            color: #3d2817;
             line-height: 1.5;
         }
 
-        .badges {
+        .features {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 8px;
-            justify-content: center;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
 
-        .badge {
-            background: rgba(240, 216, 184, 0.15);
-            border: 1px solid rgba(240, 216, 184, 0.35);
-            color: #f0d8b8;
+        .feature {
             font-size: 11px;
+            color: #6b4a30;
             letter-spacing: 1px;
             text-transform: uppercase;
-            padding: 7px 14px;
-            border-radius: 20px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .feature::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #8b6240;
+            font-size: 16px;
+            line-height: 1;
         }
 
         .cta-button {
             display: inline-block;
-            background: linear-gradient(135deg, #c9a37a, #8b6240);
+            background: #8b6240;
             color: #fff;
-            padding: 14px 36px;
-            border-radius: 30px;
+            padding: 13px 30px;
+            border-radius: 2px;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
-            letter-spacing: 2px;
+            letter-spacing: 2.5px;
             text-transform: uppercase;
-            box-shadow: 0 6px 20px rgba(139, 98, 64, 0.5);
-            transition: transform 0.2s;
+            transition: background 0.2s, transform 0.2s;
+            align-self: flex-start;
+            box-shadow: 0 4px 12px rgba(139, 98, 64, 0.25);
         }
 
         .cta-button:active {
             transform: scale(0.97);
+            background: #6b4a30;
+        }
+
+        /* Индикатор прогресса */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(139, 98, 64, 0.15);
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #8b6240;
+            width: 0%;
+            transition: width 0.05s linear;
         }
 
         /* Прелоадер */
@@ -288,7 +341,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #1a0f0a;
+            background: #e8dfd3;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -302,120 +355,125 @@
         }
 
         .preloader-text {
-            color: #f0d8b8;
-            font-size: 13px;
+            color: #8b6240;
+            font-size: 11px;
             letter-spacing: 4px;
             text-transform: uppercase;
-            font-weight: 300;
+            font-weight: 400;
         }
 
-        /* Адаптация под маленькие экраны */
         @media (max-width: 360px) {
-            .hero-title { font-size: 40px; letter-spacing: 4px; }
-            .service-name { font-size: 14px; }
-            .service-price { font-size: 16px; }
+            .hero-title { font-size: 36px; letter-spacing: 3px; }
+            .services-title, .contacts-title { font-size: 18px; }
+            .service-name { font-size: 12px; }
+            .service-price { font-size: 14px; }
+            .text-zone { width: 62%; }
+        }
+
+        /* На очень широких экранах (на компьютере) ограничиваем максимальную ширину */
+        @media (min-width: 600px) {
+            .text-zone { max-width: 380px; padding-left: 5vw; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Прелоадер -->
     <div class="preloader" id="preloader">
         <div class="preloader-text">Загрузка...</div>
     </div>
 
-    <!-- Анимация массажа -->
-    <div class="frame-container">
+    <div class="frame-container" id="frameContainer">
         <img id="frame" src="webp/frame_000.webp" alt="Массаж">
     </div>
 
-    <!-- Контент поверх анимации -->
     <div class="content-overlay">
 
-        <!-- Секция 1: Hero -->
         <div class="section section-hero" data-start="0" data-end="0.33">
-            <div class="hero-top">
+            <div class="text-zone hero-top">
                 <div class="hero-title">Массаж</div>
-                <div class="hero-subtitle">Расслабление · Здоровье · Забота</div>
+                <div class="hero-divider"></div>
+                <div class="hero-subtitle">Расслабление<br>Здоровье<br>Забота о теле</div>
             </div>
-            <div class="hero-bottom">
-                <span class="scroll-hint">↓ листайте вниз ↓</span>
+            <div class="text-zone hero-bottom">
+                <span class="scroll-hint">↑ ведите пальцем вверх</span>
             </div>
         </div>
 
-        <!-- Секция 2: Услуги -->
         <div class="section section-services" data-start="0.33" data-end="0.66">
-            <div class="services-title">Услуги и цены</div>
-            <div class="services-list">
-                <div class="service-item">
-                    <div class="service-info">
-                        <div class="service-name">Классический массаж всего тела</div>
-                        <div class="service-duration">1 час</div>
+            <div class="text-zone">
+                <div class="services-title">Услуги</div>
+                <div class="section-divider"></div>
+                <div class="services-list">
+                    <div class="service-item">
+                        <div class="service-name">Классический массаж тела</div>
+                        <div class="service-details">
+                            <span class="service-duration">1 час</span>
+                            <span class="service-price">1800 ₽</span>
+                        </div>
                     </div>
-                    <div class="service-price">1800 ₽</div>
-                </div>
-                <div class="service-item">
-                    <div class="service-info">
-                        <div class="service-name">Классический массаж всего тела</div>
-                        <div class="service-duration">1,5 часа</div>
+                    <div class="service-item">
+                        <div class="service-name">Классический массаж тела</div>
+                        <div class="service-details">
+                            <span class="service-duration">1,5 часа</span>
+                            <span class="service-price">2300 ₽</span>
+                        </div>
                     </div>
-                    <div class="service-price">2300 ₽</div>
-                </div>
-                <div class="service-item">
-                    <div class="service-info">
+                    <div class="service-item">
                         <div class="service-name">Массаж спины</div>
-                        <div class="service-duration">45 минут</div>
+                        <div class="service-details">
+                            <span class="service-duration">45 минут</span>
+                            <span class="service-price">1300 ₽</span>
+                        </div>
                     </div>
-                    <div class="service-price">1300 ₽</div>
-                </div>
-                <div class="service-item">
-                    <div class="service-info">
-                        <div class="service-name">Массаж ног, рук, стоп, головы</div>
-                        <div class="service-duration">По договорённости</div>
+                    <div class="service-item">
+                        <div class="service-name">Ноги · руки · стопы · голова</div>
+                        <div class="service-details">
+                            <span class="service-duration">по договорённости</span>
+                        </div>
                     </div>
-                    <div class="service-price">—</div>
                 </div>
-            </div>
-            <div class="service-note">
-                Скидки при покупке от 5 сеансов — обсуждаются индивидуально в зависимости от вида массажа
+                <div class="service-note">
+                    Скидки от 5 сеансов — обсуждаются индивидуально
+                </div>
             </div>
         </div>
 
-        <!-- Секция 3: Контакты -->
         <div class="section section-contacts" data-start="0.66" data-end="1.0">
-            <div class="contacts-title">Контакты</div>
+            <div class="text-zone">
+                <div class="contacts-title">Контакты</div>
+                <div class="section-divider"></div>
 
-            <div class="badges">
-                <div class="badge">🎁 Подарочные сертификаты</div>
-                <div class="badge">🚗 Работаю на выезд</div>
-            </div>
-
-            <div class="info-cards">
-                <div class="info-card">
+                <div class="info-block">
                     <div class="info-label">Адрес</div>
                     <div class="info-value">
                         Бульвар Энтузиастов, 1П, 3 этаж<br>
-                        Академия косметологии и массажа «Рада»
+                        Академия «Рада»
                     </div>
                 </div>
-                <div class="info-card">
-                    <div class="info-label">Также</div>
-                    <div class="info-value">Принимаю с выездом на дом</div>
-                </div>
-            </div>
 
-            <a href="#" class="cta-button">Записаться</a>
+                <div class="features">
+                    <div class="feature">Подарочные сертификаты</div>
+                    <div class="feature">Работаю на выезд</div>
+                </div>
+
+                <a href="#" class="cta-button">Записаться</a>
+            </div>
         </div>
 
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
     </div>
 
     <script>
         const frameImage = document.getElementById('frame');
         const preloader = document.getElementById('preloader');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const sections = document.querySelectorAll('.section');
         const totalFrames = 257;
         const framesPath = 'webp/';
 
-        // Предзагрузка кадров
         const images = [];
         let loadedCount = 0;
 
@@ -425,39 +483,32 @@
             img.src = `${framesPath}frame_${frameNum}.webp`;
             img.onload = () => {
                 loadedCount++;
-                // Когда загружены первые 30 кадров — скрываем прелоадер
                 if (loadedCount === 30) {
                     preloader.classList.add('hidden');
                 }
             };
             images.push(img);
         }
-
-        // На случай если onload не сработает — скрываем через 3 сек
         setTimeout(() => preloader.classList.add('hidden'), 3000);
 
-        // Секции
-        const sections = document.querySelectorAll('.section');
+        let progress = 0;
+        let lastTouchY = null;
+        const SENSITIVITY = 1.5;
 
-        // Обновление кадра и активной секции при скролле
-        function update() {
-            const scrollTop = window.scrollY;
-            const maxScroll = document.body.scrollHeight - window.innerHeight;
-            const scrollFraction = scrollTop / maxScroll;
-
-            // Кадр
+        function updateView() {
             const frameIndex = Math.min(
                 totalFrames - 1,
-                Math.floor(scrollFraction * totalFrames)
+                Math.max(0, Math.floor(progress * (totalFrames - 1)))
             );
             const frameNum = String(frameIndex).padStart(3, '0');
             frameImage.src = `${framesPath}frame_${frameNum}.webp`;
 
-            // Активная секция
+            progressBarFill.style.width = (progress * 100) + '%';
+
             sections.forEach(section => {
                 const start = parseFloat(section.dataset.start);
                 const end = parseFloat(section.dataset.end);
-                if (scrollFraction >= start && scrollFraction <= end) {
+                if (progress >= start && progress <= end) {
                     section.classList.add('active');
                 } else {
                     section.classList.remove('active');
@@ -465,19 +516,35 @@
             });
         }
 
-        let ticking = false;
-        window.addEventListener('scroll', () => {
-            if (!ticking) {
-                window.requestAnimationFrame(() => {
-                    update();
-                    ticking = false;
-                });
-                ticking = true;
-            }
+        const screenHeight = window.innerHeight;
+
+        document.addEventListener('touchstart', (e) => {
+            lastTouchY = e.touches[0].clientY;
+        }, { passive: false });
+
+        document.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (lastTouchY === null) return;
+            const currentY = e.touches[0].clientY;
+            const deltaY = lastTouchY - currentY;
+            lastTouchY = currentY;
+            const delta = (deltaY / screenHeight) * SENSITIVITY;
+            progress = Math.max(0, Math.min(1, progress + delta));
+            updateView();
+        }, { passive: false });
+
+        document.addEventListener('touchend', () => {
+            lastTouchY = null;
         });
 
-        // Стартовое состояние
-        update();
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = (e.deltaY / screenHeight) * SENSITIVITY * 0.5;
+            progress = Math.max(0, Math.min(1, progress + delta));
+            updateView();
+        }, { passive: false });
+
+        updateView();
     </script>
 
 </body>
